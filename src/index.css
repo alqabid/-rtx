@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --color-ink: #1F1D1B;
+  --color-graphite: #8B8479;
+  --color-guide: #4A90C4;
+  --color-correction: #C1502E;
+  --color-match: #B98A2E;
+  --color-gridline: #E4E1DA;
+}
+
+/* Sketchbook ruled grid texture - subtle 24px graph paper texture */
+.sketchbook-bg {
+  background-color: #ffffff;
+  background-image: 
+    linear-gradient(to right, rgba(228, 225, 218, 0.45) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(228, 225, 218, 0.45) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Subtle cross-hatch for special accents */
+.sketchbook-crosshatch {
+  background-color: #ffffff;
+  background-image: 
+    linear-gradient(45deg, rgba(228, 225, 218, 0.3) 1px, transparent 1px),
+    linear-gradient(-45deg, rgba(228, 225, 218, 0.3) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Drawing canvas must remain crisp white without grid overlay */
+.clean-canvas-surface {
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* Custom scrollbars matching sketchbook ink aesthetic */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #E4E1DA;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8B8479;
+}

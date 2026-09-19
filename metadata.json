@@ -1,0 +1,7 @@
+{
+  "name": "@rtx",
+  "description": "AI-powered guided drawing app breaking reference photos into ordered underdrawing steps with stroke feedback.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
