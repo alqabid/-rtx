@@ -10,6 +10,7 @@ export const NewDrawingPage: React.FC = () => {
   const { createProjectFromImage, createProjectFromPreset } = useDrawing();
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<DrawingProject['category']>('Portrait');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -26,6 +27,7 @@ export const NewDrawingPage: React.FC = () => {
 
   const handleFile = (file: File) => {
     if (!file.type.startsWith('image/')) return;
+    setImageFile(file);
     const reader = new FileReader();
     reader.onload = e => {
       if (e.target?.result) {
@@ -66,8 +68,13 @@ export const NewDrawingPage: React.FC = () => {
           return prev + 1;
         } else {
           clearInterval(interval);
-          setTimeout(() => {
-            const newId = createProjectFromImage(previewUrl, title || 'Study Project', category);
+          setTimeout(async () => {
+            const newId = await createProjectFromImage(
+              previewUrl,
+              title || 'Study Project',
+              category,
+              imageFile ?? undefined
+            );
             navigate(`/editor/${newId}`);
           }, 600);
           return prev;
