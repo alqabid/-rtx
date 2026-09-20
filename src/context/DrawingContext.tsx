@@ -7,7 +7,7 @@ interface DrawingContextType {
   user: { name: string; email: string; handle: string } | null;
   activeProject: DrawingProject | null;
   setActiveProject: (project: DrawingProject | null) => void;
-  createProjectFromImage: (imageUrl: string, title: string, category: DrawingProject['category']) => string;
+  createProjectFromImage: (imageUrl: string, title: string, category: DrawingProject['category'], imageFile?: File) => Promise<string>;
   createProjectFromPreset: (presetId: string) => string;
   getProjectById: (id: string) => DrawingProject | undefined;
   updateProject: (updated: DrawingProject) => void;
@@ -80,8 +80,39 @@ export const DrawingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setUser(null);
   };
 
-  const createProjectFromImage = (imageUrl: string, title: string, category: DrawingProject['category']): string => {
+  const createProjectFromImage = async (
+    imageUrl: string,
+    title: string,
+    category: DrawingProject['category'],
+    imageFile?: File
+  ): Promise<string> => {
     const newId = `proj-${Date.now()}`;
+
+    // Try the real backend first; fall back to mock steps if it's not
+    // reachable yet (e.g. VITE_API_BASE_URL isn't set, or the backend is down).
+    // This keeps the app fully usable even before the backend is deployed.
+    let steps: DrawingStep[] = INITIAL_STEPS_PORTRAIT.map(s => ({ ...s, isCompleted: false }));
+
+    const apiBase = import.meta.env.VITE_API_BASE_URL;
+    if (apiBase && imageFile) {
+      try {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+        const res = await fetch(`${apiBase}/generate-steps`, {
+          method: 'POST',
+          body: formData
+        });
+        if (res.ok) {
+          const generated: DrawingStep[] = await res.json();
+          if (Array.isArray(generated) && generated.length > 0) {
+            steps = generated.map(s => ({ ...s, isCompleted: false }));
+          }
+        }
+      } catch {
+        // Backend unreachable — silently fall back to mock steps above.
+      }
+    }
+
     const newProject: DrawingProject = {
       id: newId,
       title: title || 'Untitled Study',
@@ -92,10 +123,10 @@ export const DrawingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       progressPercentage: 0,
       currentStepIndex: 0,
       isCompleted: false,
-      totalSteps: 6,
+      totalSteps: steps.length,
       accuracyOverall: 92,
       timeSpentMinutes: 1,
-      steps: INITIAL_STEPS_PORTRAIT.map(s => ({ ...s, isCompleted: false })),
+      steps,
       completedStrokes: [],
       thumbnailUrl: imageUrl
     };
